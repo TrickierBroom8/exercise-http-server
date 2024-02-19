@@ -12,22 +12,12 @@ public class ConnectionHandler {
             "Content-Length: 190\n" +
             "Content-Type: text/html\n";
 
-    private static final String HTTP_BODY = "<!DOCTYPE html>\n" +
-            "<html lang=\"en\">\n" +
-            "<head>\n" +
-            "<meta charset=\"UTF-8\">\n" +
-            "<title>Simple Http Server</title>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "<h1>Hi DEA folks!</h1>\n" +
-            "<p>This is a simple line in html.</p>\n" +
-            "</body>\n" +
-            "</html>\n" +
-            "\n";
     private Socket socket;
+    private HtmlPageReader htmlPageReader;
 
     public ConnectionHandler(Socket socket) {
         this.socket = socket;
+        this.htmlPageReader = new HtmlPageReader();
         handle();
     }
 
@@ -57,9 +47,11 @@ public class ConnectionHandler {
 
     private void writeResponse(BufferedWriter outputStreamWriter) {
         try {
+            String body = htmlPageReader.readFile("index.html");
+
             outputStreamWriter.write(HTTP_HEADERS);
             outputStreamWriter.newLine();
-            outputStreamWriter.write(HTTP_BODY);
+            outputStreamWriter.write(body);
             outputStreamWriter.newLine();
             outputStreamWriter.flush();
         } catch (IOException e) {

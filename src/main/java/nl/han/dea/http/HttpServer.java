@@ -16,15 +16,17 @@ public class HttpServer {
     }
 
     public void startServer() {
-        try (
-                var serverSocket = new ServerSocket(this.tcpPort);
-        ) {
+        try (var serverSocket = new ServerSocket(this.tcpPort)) {
             System.out.println("Server accepting requests on port " + tcpPort);
 
-            var acceptedSocket = serverSocket.accept();
-            var connectionHandler = new ConnectionHandler(acceptedSocket);
-            connectionHandler.handle();
+            while (true) {
+                var acceptedSocket = serverSocket.accept();
+                var connectionHandler = new ConnectionHandler(acceptedSocket);
 
+                // Maak een nieuwe Thread voor elk HTTP-verzoek en start het
+                Thread requestHandlerThread = new Thread(connectionHandler::handle);
+                requestHandlerThread.start();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
